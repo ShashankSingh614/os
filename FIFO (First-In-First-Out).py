@@ -1,32 +1,39 @@
-def fifo(page_references, frame_count):
-  """
-  Simulates FIFO page replacement algorithm.
+from queue import Queue 
+# Function to find page faults using FIFO 
+def pageFaults(pages, n, capacity): 
+	
+	s = set() 	                    # To represent set of current pages. We use an unordered_set so that we quickly check if a page is present in set or not 
+	indexes = Queue()  	            # To store the pages in FIFO manner 
+	page_faults = 0                 # Start from initial page 
 
-  Args:
-      page_references: List of page references (integers)
-      frame_count: Number of memory frames (integer)
+	for i in range(n): 		
+		if (len(s) < capacity):                  # Check if the set can hold  more pages 			
+			if (pages[i] not in s):              # Insert it into set if not present  already which represents page fault 
+				s.add(pages[i]) 			
+				page_faults += 1                   # increment page fault 				
+				indexes.put(pages[i])              # Push the current page into the queue 
 
-  Returns:
-      A list containing the page faults and the page frames at each step.
-  """
-  frames = [None] * frame_count
-  page_faults = 0
+		# If the set is full then need to perform FIFO i.e. remove the first page of the queue from set and queue both and insert the current page 
+		else: 	
 
-  for ref in page_references:
-    if ref not in frames:
-      page_faults += 1
-      # Add to the end (FIFO) and remove the first element if full
-      frames.append(ref)
-      if len(frames) > frame_count:
-        frames.pop(0)
-    print(f"Page frames: {frames}")  # Print frames at each step (optional)
+			if (pages[i] not in s):    			     # Check if current page is not already present in the set 			
+				val = indexes.queue[0]                 # Pop the first page from the queue 
+				indexes.get() 
+				s.remove(val)                          # Remove the indexes page 
+				s.add(pages[i])                         # insert the current page 			
+				indexes.put(pages[i])                  # push the current page into  the queue 			
+				page_faults += 1                        # Increment page faults 
 
-  return page_faults, frames
+	return page_faults 
 
-# Example usage
-page_references = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2]
-frame_count = 4
-
-page_faults, frames = fifo(page_references, frame_count)
-
-print(f"Total page faults: {page_faults}")
+# Driver code 
+if __name__ == '__main__': 
+	# Input page reference string
+	pages = list(map(int, input("Enter the page reference string (comma-separated): ").split(',')))
+	n = len(pages) 
+	# Input capacity (number of pages in memory)
+	capacity = int(input("Enter the number of pages in memory: "))
+	pageFault = pageFaults(pages, n, capacity)
+	print(f"Total page faults: {pageFault}")
+	hits = n - pageFault
+	print(f"Total hits: {hits}")
