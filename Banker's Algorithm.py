@@ -1,56 +1,53 @@
-def is_safe_state(processes, available, max_need, allocation):
-  """
-  Simulates safety check in Banker's Algorithm.
+# Banker's Algorithm
 
-  Args:
-      processes: List of process names (strings)
-      available: List of available resources (integers)
-      max_need: Matrix of maximum resource needs (integers)
-      allocation: Matrix of allocated resources (integers)
+# Driver code:
+if __name__=="__main__":
+	
+	# P0, P1, P2, P3, P4 are the Process names here
+	n = 5 # Number of processes
+	m = 3 # Number of resources
+	
+	# Allocation Matrix
+	alloc = [[0, 1, 0 ],[ 2, 0, 0 ],
+			[3, 0, 2 ],[2, 1, 1] ,[ 0, 0, 2]]
+	
+	# MAX Matrix 
+	max = [[7, 5, 3 ],[3, 2, 2 ],
+			[ 9, 0, 2 ],[2, 2, 2],[4, 3, 3]]
+	
+	avail = [3, 3, 2] # Available Resources
+	
+	f = [0]*n
+	ans = [0]*n
+	ind = 0
+	for k in range(n):
+		f[k] = 0
+		
+	need = [[ 0 for i in range(m)]for i in range(n)]
+	for i in range(n):
+		for j in range(m):
+			need[i][j] = max[i][j] - alloc[i][j]
+	y = 0
+	for k in range(5):
+		for i in range(n):
+			if (f[i] == 0):
+				flag = 0
+				for j in range(m):
+					if (need[i][j] > avail[j]):
+						flag = 1
+						break
+				
+				if (flag == 0):
+					ans[ind] = i
+					ind += 1
+					for y in range(m):
+						avail[y] += alloc[i][y]
+					f[i] = 1
+					
+	print("Following is the SAFE Sequence")
+	
+	for i in range(n - 1):
+		print(" P", ans[i], " ->", sep="", end="")
+	print(" P", ans[n - 1], sep="")
 
-  Returns:
-      True if the system is in a safe state, False otherwise.
-  """
-  n = len(processes)
-  need = [[max_need[i][j] - allocation[i][j] for j in range(len(available))] for i in range(n)]
-
-  finish = [False] * n
-  work = available.copy()
-
-  safe_seq = []
-  for _ in range(n):
-    found = False
-    for i in range(n):
-      if not finish[i] and all(need[i][j] <= work[j] for j in range(len(available))):
-        for j in range(len(available)):
-          work[j] += allocation[i][j]
-        finish[i] = True
-        safe_seq.append(processes[i])
-        found = True
-        break
-
-    if not found:
-      return False
-
-  return True, safe_seq
-
-# Example usage (adjust resource types and values as needed)
-processes = ["P1", "P2", "P3"]
-available = [3, 2, 1]
-max_need = [
-  [7, 5, 3],
-  [4, 2, 2],
-  [6, 1, 2]
-]
-allocation = [
-  [0, 1, 0],
-  [2, 0, 0],
-  [1, 1, 2]
-]
-
-is_safe, safe_seq = is_safe_state(processes, available, max_need, allocation)
-
-if is_safe:
-  print("System is in a safe state. Safe sequence:", safe_seq)
-else:
-  print("System is in an unsafe state.")
+# This code is contributed by SHUBHAMSINGH10
